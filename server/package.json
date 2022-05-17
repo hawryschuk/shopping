@@ -1,0 +1,41 @@
+{
+  "name": "@restaurant-reviews/server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "bin": {
+    "restaurant-reviews": "./index.ts"
+  },
+  "scripts": {
+    "common": "npm link @hawryschuk/common @hawryschuk/dao",
+    "start": "nodemon --ext ts --exec npm run test",
+    "start:server": "nodemon --ext ts --exec ts-node index.ts --port=8001",
+    "start:server:test": "nodemon --ext ts --exec ts-node index.ts --port=8002 --memory",
+    "test": "ts-mocha *.spec.ts --exclude ShoppingApplicationOverRestApi.spec.ts --timeout=15000",
+    "test:server": "nodemon --ext ts --exec \"sleep 2 && ts-mocha ShoppingApplicationOverRestApi.spec.ts\" --timeout=15000"
+  },
+  "author": "Alex Hawryschuk",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jwt-simple": "^0.5.6",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.16",
+    "@types/chai-http": "^4.2.0",
+    "@types/expect": "^24.3.0",
+    "@types/express": "^4.17.11",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^14.14.37",
+    "axios": "^0.21.1",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.3.2",
+    "nodemon": "^2.0.7",
+    "ts-mocha": "^8.0.0"
+  }
+}

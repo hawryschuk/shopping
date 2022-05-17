@@ -1,0 +1,84 @@
+<ng-container *ngIf="api.app.user && { 
+                                        user: api.app.user,
+                                        cart: cart|async
+                                     } as vars
+">
+
+    <div>
+        <p> Total : {{ vars.user?.cartTotal }} </p>
+        <button (click)="api.app.checkout()" class="btn btn-primary"> Checkout </button>
+    </div>
+
+    <clr-datagrid [clrDgRowSelection]="false">
+
+        <clr-dg-placeholder>There is nothing in your cart. You may want to check some <a routerLink="stores">stores</a>
+            out first!</clr-dg-placeholder>
+
+        <clr-dg-action-bar>
+            <div class="btn-group">
+            </div>
+        </clr-dg-action-bar>
+
+
+        <clr-dg-column [clrDgField]="'description'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column [clrDgField]="'quantity'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Quantity
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column [clrDgField]="'unit_price'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Price
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column>
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let item of vars.cart" [clrDgSelectable]="true" [clrDgItem]="item"
+            [clrDgSelected]="api.selectedMenuItem==item">
+            <clr-dg-cell>
+                {{ item.MenuItem.name }}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{ item.quantity }}
+                <button class="action-item"
+                    (click)="item.quantity = prompt('Quantity:',item.quantity) || item.quantity">
+                    <cds-icon shape="plus"></cds-icon>
+                </button>
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{ item.totalCost }}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                <button class="action-item" (click)="removeItemFromCart(item)">
+                    <cds-icon shape="trash"></cds-icon>
+                </button>
+            </clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>
+            <clr-dg-column-toggle>
+                <clr-dg-column-toggle-title>Menu Properties</clr-dg-column-toggle-title>
+                <clr-dg-column-toggle-button>select all</clr-dg-column-toggle-button>
+            </clr-dg-column-toggle>
+
+            <clr-dg-pagination #pagination [clrDgPageSize]="50">
+                <clr-dg-page-size [clrPageSizeOptions]="[50,500,5000]">items per page</clr-dg-page-size>
+                <span>{{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}}
+                    items</span>
+            </clr-dg-pagination>
+        </clr-dg-footer>
+
+    </clr-datagrid>
+
+</ng-container>

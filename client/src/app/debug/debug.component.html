@@ -1,0 +1,35 @@
+<div>
+    <button (click)="api.setup(true)">Dev::Setup(Test Data)</button>
+    <hr>
+    <button (click)="api.signup({email:'test@test.com',Password:'test',name:'test'})"> Visitor::Signup </button>
+    <button (click)="api.logout()"> User::Logout </button>
+    <hr>
+    <button (click)="api.credentials={email:'alex+admin@hawryschuk.com',Password:'2021'}"> Visitor::Login::Admin
+    </button>
+    <button (click)="api.credentials={email:'alex+regular1@hawryschuk.com',Password:'2021'}"> Visitor::Login::Shopper
+    </button>
+    <button (click)="api.credentials={email:'alex+owner@hawryschuk.com',Password:'2021'}"> Visitor::Login::StoreOwner
+    </button>
+
+    <clr-toggle-container>
+        <clr-toggle-wrapper>
+            <input type="checkbox" clrToggle name="options" required value="on" [(ngModel)]="api.FeatureFlags.debug" />
+            <label>Debug</label>
+        </clr-toggle-wrapper>
+    </clr-toggle-container>
+
+</div>
+
+<pre>
+    {{  {
+            credentials: api.credentials$|async,
+            token: api.token$|async,
+            User: api.User$|async,
+            Users: api.Users$|async,
+            MyStores: api.MyStores$|async,
+            Stores: api.Stores$|async
+        } | json
+    }}
+
+
+</pre>

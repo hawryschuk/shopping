@@ -1,0 +1,95 @@
+<ng-container *ngIf="{users:api.Users$|async} as vars">
+    <clr-modal *ngIf="editedUser" [(clrModalOpen)]="editedUser">
+        <h3 class="modal-title">Edit User</h3>
+        <div class="modal-body">
+            <form clrForm clrLayout="horizontal">
+                <clr-input-container>
+                    <label>Date Created</label>
+                    <input clrInput required disabled name="created" type="text" [(ngModel)]="editedUser.created">
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Name</label>
+                    <input clrInput required name="name" type="text" [(ngModel)]="editedUser.name">
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Email</label>
+                    <input clrInput required disabled name="email" type="email" [(ngModel)]="editedUser.email">
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Category</label>
+                    <input clrInput required disabled name="category" type="text" [(ngModel)]="editedUser.category">
+                </clr-input-container>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="editedUser=null">Cancel</button>
+            <button type="button" class="btn btn-primary"
+                (click)="api.app.update(userToEdit,editedUser) && (editedUser=null)">Save</button>
+        </div>
+    </clr-modal>
+
+    <clr-datagrid [clrDgLoading]="!vars.users" [clrDgRowSelection]="true">
+        <clr-dg-column style="width: 250px" [clrDgField]="'category'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Category
+            </ng-container>
+        </clr-dg-column>
+        <clr-dg-column style="width: 250px" [clrDgField]="'created'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Created
+            </ng-container>
+        </clr-dg-column>
+        <clr-dg-column style="width: 250px" [clrDgField]="'email'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Email
+            </ng-container>
+        </clr-dg-column>
+        <clr-dg-column style="width: 250px" [clrDgField]="'name'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Name
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let user of vars.users">
+            <clr-dg-action-overflow>
+                <button (click)="(userToEdit=user) && (editedUser=user.clone())" class="action-item">
+                    <cds-icon shape="note"></cds-icon>
+                    Edit User
+                </button>
+                <button (click)="api.deleteUser(user)" class="action-item">
+                    <cds-icon shape="trash"></cds-icon>
+                    Delete User
+                </button>
+            </clr-dg-action-overflow>
+
+            <clr-dg-cell>
+                {{user.category}}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{user.created.toLocaleDateString()}}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{user.email}}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{user.name}}
+            </clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>
+            <clr-dg-column-toggle>
+                <clr-dg-column-toggle-title>Columns</clr-dg-column-toggle-title>
+                <clr-dg-column-toggle-button>select all</clr-dg-column-toggle-button>
+            </clr-dg-column-toggle>
+
+            <clr-dg-pagination #pagination [clrDgPageSize]="10">
+                <clr-dg-page-size [clrPageSizeOptions]="[10,100,1000]">users per page
+                </clr-dg-page-size>
+                <span>{{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of
+                    {{pagination.totalItems}}
+                    users</span>
+            </clr-dg-pagination>
+        </clr-dg-footer>
+
+    </clr-datagrid>
+</ng-container>

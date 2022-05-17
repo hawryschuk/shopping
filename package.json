@@ -1,0 +1,22 @@
+{
+  "name": "restaurant-reviews",
+  "version": "1.0.0",
+  "description": "2021-04-02",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm-run-all -p -r start:* dev:* test:*",
+    "dev:model": "cd model && start npm start",
+    "dev:server": "cd server && start npm start",
+    "start:server": "cd server && start npm run start:server:test",
+    "test:server": "cd server && start npm run test:server",
+    "dev:ui": "cd client && start npm start",
+    "dev:ui-e2e": "cd client && start npm run e2e",
+    "dev:ui-e2e-restapi": "cd client && start npm run e2e:restapi"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Alex Hawryschuk",
+  "license": "UNLICENSED"
+}

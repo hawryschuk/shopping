@@ -1,0 +1,56 @@
+<ng-container *ngIf="api.app.user && { 
+    purchases: purchases$|async
+ } as vars
+">
+
+    <clr-datagrid [clrDgRowSelection]="false">
+
+        <clr-dg-placeholder>You've not purchased anything. You may want to check some <a routerLink="stores">stores</a>
+            out first!</clr-dg-placeholder>
+
+        <clr-dg-column [clrDgField]="'date'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Date
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column [clrDgField]="'Store.name'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Store
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column [clrDgField]="'totalCost'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Total Cost
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let item of vars.purchases" [clrDgSelectable]="true" [clrDgItem]="item">
+            <clr-dg-cell>
+                {{ item.date }}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{ item.Store.name }}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{ item.totalCost }}
+            </clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>
+            <clr-dg-column-toggle>
+                <clr-dg-column-toggle-title>Columns</clr-dg-column-toggle-title>
+                <clr-dg-column-toggle-button>select all</clr-dg-column-toggle-button>
+            </clr-dg-column-toggle>
+
+            <clr-dg-pagination #pagination [clrDgPageSize]="50">
+                <clr-dg-page-size [clrPageSizeOptions]="[50,500,5000]">items per page</clr-dg-page-size>
+                <span>{{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}}
+                    items</span>
+            </clr-dg-pagination>
+        </clr-dg-footer>
+
+    </clr-datagrid>
+
+</ng-container>

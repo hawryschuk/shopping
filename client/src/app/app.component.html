@@ -1,0 +1,81 @@
+<ng-container *ngIf=" {  
+                        user                        : api.User$|async,
+                        purchasesPendingCompletion$ : api.PurchasesPendingCompletion$|async,
+                        errors                      : api.errors$|async,
+                        loading                     : api.loading.tasks
+                      } as vars
+">
+  <div class="main-container" [attr.data-user-category]="vars.user?.category" [attr.data-user]="!!vars.user">
+
+    <clr-modal [clrModalClosable]="false" [clrModalSize]="'sm'" [clrModalStaticBackdrop]="true"
+      [(clrModalOpen)]="vars.loading">
+      <div class="modal-body loading">
+        <clr-spinner></clr-spinner>
+        <p>Loading...</p>
+      </div>
+    </clr-modal>
+
+    <header class="header-6">
+      <div class="branding"> <a [routerLink]="['/']">
+          <cds-icon shape="world"></cds-icon>
+          <span class="title">Store Shopping</span>
+          <span class="subtitle"> &mdash; Enabling Store Owners and Shoppers to check out products</span>
+        </a>
+      </div>
+      <div *ngIf="vars.user" class="header-actions header-actions--overflow">
+        <span>{{vars.user.name}}</span>
+        <button class="btn btn-primary" (click)="api.logout()">Logout</button>
+      </div>
+    </header>
+
+    <nav class="subnav">
+      <ul class="nav">
+        <li *ngIf="!vars.user" class="nav-item"> <a class="nav-link" routerLinkActive="active"
+            routerLink="login">Login</a> </li>
+
+        <li *ngIf="!vars.user" class="nav-item"> <a class="nav-link" routerLinkActive="active" routerLink="signup">Sign
+            Up</a></li>
+
+        <li *ngIf="vars.user" class="nav-item"> <a class="nav-link" routerLinkActive="active"
+            routerLink="stores">Stores</a> </li>
+
+        <li *ngIf="vars.user?.category=='Shopper' && vars.user.cart.length" class="nav-item"> <a class="nav-link"
+            routerLinkActive="active" routerLink="cart">My Cart <span class="badge badge-info">{{vars.user.cart.length}}</span></a> </li>
+
+        <li *ngIf="vars.user?.category=='Shopper' && vars.user.purchase_ids.length" class="nav-item"> <a class="nav-link" routerLinkActive="active"
+            routerLink="purchases">My Purchases <span class="badge badge-info">{{vars.user.purchase_ids.length}}</span></a> </li>
+
+        <li *ngIf="vars.user?.category=='Admin'" class="nav-item"> <a class="nav-link" routerLinkActive="active"
+            routerLink="users">Users</a> </li>
+
+        <li *ngIf="vars.user?.category=='StoreOwner'" class="nav-item"> <a class="nav-link reviews-pending-response"
+            routerLinkActive="active" routerLink="purchasesPendingCompletion">
+            Purchases Pending Completion
+            <span
+              class="badge badge-{{ vars.purchasesPendingCompletion?.length ? 'info' : 'success' }}">{{vars.purchasesPendingCompletion?.length || 0}}</span>
+          </a> </li>
+
+        <li class="nav-item"> <a class="nav-link" routerLinkActive="active" routerLink="docs">Docs</a> </li>
+
+        <li *ngIf="api.FeatureFlags.debug" class="nav-item"> <a class="nav-link" routerLinkActive="active"
+            routerLink="debug">Debug</a> </li>
+      </ul>
+    </nav>
+
+    <div cds-layout="vertical gap:sm">
+      <cds-alert-group *ngIf="vars.errors?.length" status="danger" aria-label="">
+        <cds-alert (closeChange)="api.errors$.next(api.errors$.value.slice(1))" closable aria-label="">
+          {{ vars.errors[0].message || vars.errors[0].error?.message || vars.errors[0].error?.error || vars.errors[0].error || vars.errors[0] }}
+        </cds-alert>
+      </cds-alert-group>
+    </div>
+
+    <div class="content-container">
+      <div class="content-area">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>

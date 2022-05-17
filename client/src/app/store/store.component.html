@@ -1,0 +1,165 @@
+<ng-container *ngIf="store &&   {
+                                    UserIsStoreOwner    : api.UserIsStoreOwner$ |async,
+                                    UserIsAdmin         : api.UserIsAdmin$      |async,
+                                    UserIsShopper       : api.UserIsShopper$    |async
+                                } as vars">
+
+    <clr-modal *ngIf="menuitemToEdit && { newMenuItem: newMenuItem==editedMenuItem } as vars"
+        [(clrModalOpen)]="menuitemToEdit">
+        <h3 class="modal-title"> {{vars.newMenuItem ? 'New' : 'Edit'}} Menu Item </h3>
+        <div class="modal-body">
+            <form>
+                <fieldset>
+                    <label> Name: </label>
+                    <input [(ngModel)]="editedMenuItem.name" name="name" />
+                </fieldset>
+                <fieldset>
+                    <label> Price: </label>
+                    <input [(ngModel)]="editedMenuItem.price" name="price" />
+                </fieldset>
+                <fieldset>
+                    <label> Description:</label>
+                    <textarea rows=5 [(ngModel)]="editedMenuItem.description" name="description"></textarea>
+                </fieldset>
+                <fieldset>
+                    <label> Inventory:</label>
+                    <input type="number" min="0" [disabled]="vars.UserIsAdmin" [(ngModel)]="editedMenuItem.inventory"
+                        name="inventory" />
+                    <p *ngIf="(editedMenuItem.inventory - menuitemToEdit.inventory) as adjusted"
+                        style="font-size: smaller;">
+                        {{adjusted}} units adjusted
+                    </p>
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="menuitemToEdit=null">Cancel</button>
+
+            <button *ngIf="vars.newMenuItem" type="button" class="btn btn-primary"
+                (click)="api.app.addMenuItem(store,editedMenuItem) && (menuitemToEdit=null)">Add</button>
+
+            <button *ngIf="!vars.newMenuItem" type="button" class="btn btn-primary"
+                (click)="api.app.editMenuItem(store,menuitemToEdit,editedMenuItem) && (menuitemToEdit=null)">Save</button>
+        </div>
+    </clr-modal>
+
+    <div class="overview">
+        <h2>{{store.name}}</h2>
+    </div>
+
+    <div class="menu">
+        <clr-tabs>
+            <clr-tab>
+                <button clrTabLink>Menu</button>
+                <clr-tab-content *clrIfActive>
+                    <!-- select row to respond/edit/delete a review -->
+                    <clr-datagrid [clrDgRowSelection]="true">
+
+                        <clr-dg-placeholder>No products for sale...</clr-dg-placeholder>
+
+                        <clr-dg-column style="width: 150px" [clrDgField]="'name'">
+                            <ng-container *clrDgHideableColumn="{hidden: false}">
+                                Name
+                            </ng-container>
+                        </clr-dg-column>
+                        <clr-dg-column style="width: 250px" [clrDgField]="'description'">
+                            <ng-container *clrDgHideableColumn="{hidden: false}">
+                                Description
+                            </ng-container>
+                        </clr-dg-column>
+                        <clr-dg-column style="width: 50px" [clrDgField]="'price'">
+                            <ng-container *clrDgHideableColumn="{hidden: false}">
+                                Price
+                            </ng-container>
+                        </clr-dg-column>
+                        <clr-dg-column [clrDgField]="'inventory'">
+                            <ng-container *clrDgHideableColumn="{hidden: false}">
+                                Remaining Inventory
+                            </ng-container>
+                        </clr-dg-column>
+
+                        <clr-dg-action-bar>
+                            <div class="btn-group">
+                                <button *ngIf="vars.UserIsStoreOwner"
+                                    (click)="(newMenuItem=editedMenuItem=menuitemToEdit=generateMenuItem())"
+                                    class="btn btn-sm btn-secondary">
+                                    <cds-icon shape="plus"></cds-icon>
+                                    New MenuItem
+                                </button>
+                            </div>
+                        </clr-dg-action-bar>
+
+                        <clr-dg-row *clrDgItems="let menuitem of store.menu">
+                            <clr-dg-action-overflow>
+                                <button *ngIf="vars.UserIsShopper" (click)="api.app.addToCart(menuitem)"
+                                    class="action-item">
+                                    <cds-icon shape="note"></cds-icon>
+                                    Add to Cart
+                                </button>
+
+                                <button *ngIf="vars.UserIsStoreOwner || vars.UserIsAdmin"
+                                    (click)="(menuitemToEdit=menuitem) && (editedMenuItem=menuitem.clone())"
+                                    class="action-item">
+                                    <cds-icon shape="note"></cds-icon>
+                                    Edit MenuItem
+                                </button>
+
+                                <button *ngIf="vars.UserIsAdmin || vars.UserIsStoreOwner"
+                                    (click)="api.app.deleteMenuitem(store,menuitem)" class="action-item">
+                                    <cds-icon shape="trash"></cds-icon>
+                                    Delete MenuItem
+                                </button>
+                            </clr-dg-action-overflow>
+
+                            <clr-dg-cell>
+                                {{menuitem.name}}
+                            </clr-dg-cell>
+                            <clr-dg-cell>
+                                {{menuitem.description}}
+                            </clr-dg-cell>
+                            <clr-dg-cell>
+                                {{menuitem.price}}
+                            </clr-dg-cell>
+                            <clr-dg-cell>
+                                {{menuitem.inventory}}
+                            </clr-dg-cell>
+                        </clr-dg-row>
+
+                        <clr-dg-footer>
+                            <clr-dg-column-toggle>
+                                <clr-dg-column-toggle-title>Columns</clr-dg-column-toggle-title>
+                                <clr-dg-column-toggle-button>select all</clr-dg-column-toggle-button>
+                            </clr-dg-column-toggle>
+
+                            <clr-dg-pagination #pagination [clrDgPageSize]="10">
+                                <clr-dg-page-size [clrPageSizeOptions]="[10,100,1000]">menu-items per page
+                                </clr-dg-page-size>
+                                <span>{{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of
+                                    {{pagination.totalItems}}
+                                    menu-items</span>
+                            </clr-dg-pagination>
+                        </clr-dg-footer>
+
+                    </clr-datagrid>
+
+                </clr-tab-content>
+            </clr-tab>
+
+            <clr-tab *ngIf="store.bestReview as r">
+                <button clrTabLink>Best Review</button>
+                <clr-tab-content *clrIfActive>
+                    <app-review [review]="r"></app-review>
+                </clr-tab-content>
+            </clr-tab>
+
+            <clr-tab *ngIf="store.worstReview as r">
+                <button clrTabLink [clrTabLinkInOverflow]="inOverflow">Worst Review</button>
+                <clr-tab-content *clrIfActive>
+                    <app-review [review]="r"></app-review>
+                </clr-tab-content>
+            </clr-tab>
+        </clr-tabs>
+
+    </div>
+
+</ng-container>

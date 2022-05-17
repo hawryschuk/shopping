@@ -1,0 +1,122 @@
+<ng-container *ngIf="{ 
+                        stores  : api.Stores$   |async,
+                        User    : api.User$     |async
+                    } as vars
+">
+
+
+    <clr-modal *ngIf="storeToPost" [(clrModalOpen)]="storeToPost">
+        <h3 class="modal-title">Add Your Store</h3>
+        <div class="modal-body">
+            <form clrForm clrLayout="horizontal">
+                <clr-input-container>
+                    <label>Name</label>
+                    <input required placeholder="Name" clrInput name="name" [(ngModel)]="storeToPost.name">
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Address</label>
+                    <input placeholder="Address" clrInput name="address" [(ngModel)]="storeToPost.address">
+                </clr-input-container>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="storeToPost=null">Cancel</button>
+            <button type="button" class="btn btn-primary"
+                (click)="api.createRestaurant(storeToPost) && (storeToPost=null)">Add</button>
+        </div>
+    </clr-modal>
+
+    <clr-modal *ngIf="storeToEdit" [(clrModalOpen)]="storeToEdit">
+        <h3 class="modal-title">Edit Store</h3>
+        <div class="modal-body">
+            <form clrForm clrLayout="horizontal">
+                <clr-input-container>
+                    <label>Name</label>
+                    <input required type="text" clrInput name="name" [(ngModel)]="editedStore.name" />
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Address</label>
+                    <input required type="text" clrInput name="address" [(ngModel)]="editedStore.address" />
+                </clr-input-container>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="storeToEdit=null">Cancel</button>
+            <button type="button" class="btn btn-primary"
+                (click)="api.app.update(storeToEdit,editedStore) && (storeToEdit=null)">Save</button>
+        </div>
+    </clr-modal>
+
+    <clr-datagrid [clrDgLoading]="!vars.stores" [clrDgRowSelection]="true">
+
+        <clr-dg-action-bar>
+
+            <div class="btn-group">
+
+                <button *ngIf="vars.User?.category=='StoreOwner'" type="button" class="btn btn-sm btn-secondary"
+                    (click)="storeToPost=generateStore()">
+                    <cds-icon shape="plus"></cds-icon>
+                    Add Store
+                </button>
+
+                <button *ngIf="vars.User?.category=='Admin' && api.app.store" type="button"
+                    class="btn btn-sm btn-secondary"
+                    (click)="(storeToEdit=api.app.store) && (editedStore=api.app.store.clone())">
+                    <cds-icon shape="note"></cds-icon>
+                    Edit Store
+                </button>
+
+                <button *ngIf="vars.User?.category=='Admin' && api.app.store" type="button"
+                    class="btn btn-sm btn-secondary"
+                    (click)="api.deleteStore(api.app.store) && (api.app.store=null)">
+                    <cds-icon shape="trash"></cds-icon>
+                    Delete Store
+                </button>
+            </div>
+        </clr-dg-action-bar>
+
+        <clr-dg-column style="width: 250px" [clrDgField]="'name'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                Name
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-column style="width: 150px" clrDgField="menu.length" [clrDgColType]="'number'">
+            <ng-container *clrDgHideableColumn="{hidden: false}">
+                # Menu Items
+            </ng-container>
+        </clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let store of vars.stores" [clrDgSelectable]="true" [clrDgItem]="store"
+            [clrDgSelected]="api.app.store==store">
+            <clr-dg-cell>
+                {{store.name}}
+            </clr-dg-cell>
+            <clr-dg-cell>
+                {{store.menu.length}}
+            </clr-dg-cell>
+        </clr-dg-row>
+
+        <ng-template clrIfDetail let-detail [(clrIfDetail)]="api.app.store">
+            <clr-dg-detail>
+                <clr-dg-detail-body>
+                    <app-store [store]="api.app.store"></app-store>
+                </clr-dg-detail-body>
+            </clr-dg-detail>
+        </ng-template>
+
+        <clr-dg-footer>
+            <clr-dg-column-toggle>
+                <clr-dg-column-toggle-title>Store Properties</clr-dg-column-toggle-title>
+                <clr-dg-column-toggle-button>select all</clr-dg-column-toggle-button>
+            </clr-dg-column-toggle>
+
+            <clr-dg-pagination #pagination [clrDgPageSize]="50">
+                <clr-dg-page-size [clrPageSizeOptions]="[50,500,5000]">stores per page</clr-dg-page-size>
+                <span>{{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}}
+                    stores</span>
+            </clr-dg-pagination>
+        </clr-dg-footer>
+
+    </clr-datagrid>
+</ng-container>

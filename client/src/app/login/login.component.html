@@ -1,0 +1,18 @@
+<!-- following design guideline https://clarity.design/angular-components/login/api/ -->
+<div class="login-wrapper">
+    <form class="login">
+        <div class="login-group">
+            <clr-input-container>
+                <label class="clr-sr-only">Email</label>
+                <input type="email" name="email" clrInput placeholder="Email" [(ngModel)]="api.email" />
+            </clr-input-container>
+            <clr-password-container>
+                <label class="clr-sr-only">Password</label>
+                <input type="password" name="Password" clrPassword placeholder="Password" [(ngModel)]="api.Password" />
+            </clr-password-container>
+            <div *ngIf="(api.authenticated$|async)?.error as error" class="error active"> {{error?.message || error}} </div>
+            <button (click)="api.login()" type="submit" class="btn btn-primary">Log In</button>
+            <a [routerLink]="'/signup'" class="signup">Sign up</a>
+        </div>
+    </form>
+</div>
